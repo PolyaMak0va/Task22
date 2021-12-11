@@ -12,24 +12,38 @@ namespace Task22
         // Сформировать массив случайных целых чисел (размер  задается пользователем). Вычислить сумму чисел массива и максимальное число в массиве.
         // Реализовать  решение  задачи  с  использованием  механизма  задач продолжения.
         static int n;
-        static int sum = 0;
+        static int sum;
         static int[] array;
         static void Method1()
         {
+            Console.Write("Введите число для создания массива: ");
+            int n = Convert.ToInt32(Console.ReadLine());
+
+            int[] array = new int[n];
+            Random random = new Random();
+            for (int i = 0; i < n; i++)
+            {
+                array[i] = random.Next(-10, 10);
+                Console.Write("{0} ", array[i]);
+                Thread.Sleep(300);
+            }
+            Console.WriteLine();
+        }
+
+        static void Method2()
+        {
             Console.WriteLine("Method1 начал работу");
-            
+
             for (int i = 0; i < n; i++)
             {
                 sum += array[i];
                 Thread.Sleep(500);
-                
+                Console.WriteLine($"Sum: {sum}");
             }
-            //return sum;
-            Console.WriteLine($"Sum: {sum}");
             Console.WriteLine("Method1 окончил работу");
-            
         }
-        static void Method2(Task task, object a)
+
+        static void Method3(Task task, object a)
         {
             n = (int)a;
             int max = array[0];
@@ -45,48 +59,13 @@ namespace Task22
 
         static void Main(string[] args)
         {
-            Console.Write("Введите число для создания массива: ");
-            int n = Convert.ToInt32(Console.ReadLine());
+            Method1();
 
-            int[] array = new int[n];
-            Random random = new Random();
-            for (int i = 0; i < n; i++)
-            {
-                array[i] = random.Next(-10, 10);
-                Console.Write("{0} ", array[i]);
-            }
-            Console.WriteLine();
+            Action action2 = new Action(Method2);
+            Task task2 = Task.Factory.StartNew(action2);
 
-            Func<int> func=new Func<int>(Method1);                    
-            Task<int> task1 = new Task<int>(() => sum(n));
-
-
-            Task task2 = task1.ContinueWith(sum => Method1(sum.Result));
-            //Action<Task, object> actionTask = new Action<Task, object>(Method2);
-            //Task task2 = task1.ContinueWith(actionTask, n);
-
-            task1.Start();
-            
-
-            //Task<int> task1 = new Task<int>(() => sum(n));
-
-            // задача продолжения
-            //Task task2 = task1.ContinueWith(sum => Method1(sum.Result));
-
-            //task1.Start();
-
-            // ждем окончания второй задачи
-            //task2.Wait();
-            //Console.WriteLine("End of Main");
-
-            //Action<int> action = new Action<int>(Method1);
-            //Task<int> task = new Task<int>(action);
-
-            //Action<Task, object> actionTask = new Action<Task, object>(Method1);
-            //Task task2 = task.ContinueWith(actionTask, 100);
-            //task.Start();
-            //Console.WriteLine(task.Result);
-            task1.Wait();
+            //Task task = new Task(() => Console.WriteLine(sum));
+            //task.Wait();
             Console.WriteLine("Main окончил работу");
             Console.ReadKey();
         }
