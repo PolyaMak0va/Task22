@@ -11,62 +11,94 @@ namespace Task22
     {
         // Сформировать массив случайных целых чисел (размер  задается пользователем). Вычислить сумму чисел массива и максимальное число в массиве.
         // Реализовать  решение  задачи  с  использованием  механизма  задач продолжения.
-        static int n;
         static int sum;
-        static int[] array;
-        static void Method1()
+
+        static void Method1(object arr)
         {
-            Console.Write("Введите число для создания массива: ");
-            int n = Convert.ToInt32(Console.ReadLine());
-
-            int[] array = new int[n];
-            Random random = new Random();
-            for (int i = 0; i < n; i++)
-            {
-                array[i] = random.Next(-10, 10);
-                Console.Write("{0} ", array[i]);
-                Thread.Sleep(300);
-            }
-            Console.WriteLine();
-        }
-
-        static void Method2()
-        {
-            Console.WriteLine("Method1 начал работу");
-
-            for (int i = 0; i < n; i++)
+            Console.WriteLine("\n\nMethod1 начал работу\n");
+            int[] array = (int[])arr;
+            for (int i = 0; i < array.Length; i++)
             {
                 sum += array[i];
-                Thread.Sleep(500);
-                Console.WriteLine($"Sum: {sum}");
+                Thread.Sleep(200);
             }
-            Console.WriteLine("Method1 окончил работу");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.BackgroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine($"\tСумма всех чисел массива равна: {sum}.\n");
+            Console.ResetColor();
+            Console.WriteLine("Method1 окончил работу\n");
         }
 
-        static void Method3(Task task, object a)
+        static void Method2(Task task, object a)
         {
-            n = (int)a;
+            Console.WriteLine("Method2 начал работу\n");
+            int[] array = (int[])a;
             int max = array[0];
             foreach (int b in array)
             {
                 if (b > max)
                     max = b;
-                Thread.Sleep(1000);
-                Console.WriteLine(max);
+                Thread.Sleep(500);
             }
-            Console.WriteLine("Method2 окончил работу");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.BackgroundColor = ConsoleColor.Gray;
+            Console.WriteLine($"\tМаксимальное число в массиве - это число {max}.\n");
+            Console.ResetColor();
+            Console.WriteLine("Method2 окончил работу\n");
         }
-
+        static void Method3(Task task, object a)
+        {
+            Console.WriteLine("Method3 начал работу\n");
+            int[] array = (int[])a;
+            int min = array[0];
+            foreach (int b in array)
+            {
+                if (b < min)
+                    min = b;
+                Thread.Sleep(500);
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine($"\tМинимальное число в массиве - это число {min}.\n");
+            Console.ResetColor();
+            Console.WriteLine("Method3 окончил работу\n");
+        }
         static void Main(string[] args)
         {
-            Method1();
+            Console.Write("Введите число для создания массива: ");
 
-            Action action2 = new Action(Method2);
-            Task task2 = Task.Factory.StartNew(action2);
+            try
+            {
+                int n = Convert.ToInt32(Console.ReadLine());
+                int[] array = new int[n];
+                Random random = new Random();
 
-            //Task task = new Task(() => Console.WriteLine(sum));
-            //task.Wait();
-            Console.WriteLine("Main окончил работу");
+                for (int i = 0; i < n; i++)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    array[i] = random.Next(-10, 10);
+                    Console.Write("\t{0} ", array[i]);                   
+                }               
+                Console.ResetColor();
+
+                Action<object> action1 = new Action<object>(Method1);
+                Task task1 = Task.Factory.StartNew(action1, array);
+                task1.Wait();
+
+                Action<Task, object> actionTask1 = new Action<Task, object>(Method2);
+                Task task2 = task1.ContinueWith(actionTask1, array);
+                task2.Wait();
+
+                Action<Task, object> actionTask2 = new Action<Task, object>(Method3);
+                Task task3 = task1.ContinueWith(actionTask2, array);
+                task3.Wait();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка! {ex.Message}");
+            }
+
+            Console.WriteLine("Main окончил работу...");
             Console.ReadKey();
         }
     }
